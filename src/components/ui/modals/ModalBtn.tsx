@@ -3,7 +3,7 @@ import { IconType } from "react-icons";
 
 interface ButtonProps {
   label: string | ReactNode;
-  //onClick: () => void;
+  onClick: () => void;
   disable?: boolean;
   outline?: boolean;
   small?: boolean;
@@ -12,7 +12,7 @@ interface ButtonProps {
 
 const ModalButton = ({
   label,
-  //onClick,
+  onClick,
   disable = false,
   outline = false,
   small = false,
@@ -20,7 +20,7 @@ const ModalButton = ({
 }: ButtonProps) => {
   return (
     <button
-      //onClick={onClick}
+      onClick={onClick}
       disabled={disable}
       className={`relative disabled:opacity-70 disabled:cursor-not-allowed rounded-lg hover:opacity-80 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg w-full
         ${outline ? "bg-white" : "bg-primary"}

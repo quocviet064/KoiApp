@@ -1,22 +1,23 @@
 import { useCallback, useState } from "react"
-
+import { useDispatch } from "react-redux";
 import { yupResolver } from "@hookform/resolvers/yup"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import { ClipLoader } from "react-spinners"
 import * as yup from "yup"
-
 import useLoginModal from "@/hooks/useLoginModal"
 import useSignupModal from "@/hooks/useSignupModal"
-
 import Input from "../Input"
 import Heading from "../ModalHead"
 import Modal from "./Modal"
-import Button from "./ModalBtn"
+import { setCurrentUser } from "@/lib/redux/reducers/userSlice"
+import { loginUser } from "@/lib/api/Authen"
+import toast from "react-hot-toast";
+import { AppDispatch } from "@/lib/redux/store";
 
 // Define the schema with yup
 const schema = yup.object().shape({
-  email: yup.string().email("Email is invalid").required("Email is required"),
-  password: yup.string().required("Password is required")
+  email: yup.string().required("Vui lòng nhập tên hoặc email của bạn"),
+  password: yup.string().required("Mật khẩu là bắt buộc")
 })
 
 interface LoginFormData {
@@ -25,7 +26,7 @@ interface LoginFormData {
 }
 
 const LoginModal = () => {
-  //const registerModal = useRegisterModal();
+  const dispatch = useDispatch<AppDispatch>(); 
   const loginModal = useLoginModal()
   const signupModal = useSignupModal()
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -42,6 +43,35 @@ const LoginModal = () => {
     resolver: yupResolver(schema)
   })
 
+  const onSubmit: SubmitHandler<LoginFormData> = useCallback(
+    async (data) => {
+      try {
+        setIsLoading(true);
+        const result = await dispatch(loginUser(data.email, data.password));
+        setIsLoading(false);
+
+        // Store token in localStorage (or sessionStorage as in loginUser function)
+        if (result && result.user) {
+          const mappedUser = {
+            Id: result.user.Id,  
+            Name: result.user.Name,
+            Email: result.user.Email,
+            Role: result.user.Role,
+          };
+          dispatch(setCurrentUser(mappedUser));
+          
+          toast.success(result.message);
+          loginModal.onClose();
+        }
+      } catch (error: any) {
+        setIsLoading(false);
+        toast.error("Invalid email or password!");
+        console.error("Login error:", error);
+      }
+    },
+    [loginModal, dispatch]
+  );
+
   const toogle = useCallback(() => {
     loginModal.onClose()
     signupModal.onOpen()
@@ -56,7 +86,7 @@ const LoginModal = () => {
 
       <Input
         id="email"
-        label="Email"
+        label="Email hoặc tên"
         disabled={isLoading}
         register={register}
         errors={errors}
@@ -115,7 +145,7 @@ const LoginModal = () => {
         isLoading ? <ClipLoader size={20} color={"#fff"} /> : "Tiếp tục"
       }
       onClose={loginModal.onClose}
-      //onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
       footer={footerContent}
     />

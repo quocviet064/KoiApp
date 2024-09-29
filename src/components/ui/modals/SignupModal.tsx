@@ -4,13 +4,15 @@ import { useCallback, useState } from "react"
 
 import { yupResolver } from "@hookform/resolvers/yup"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { ClipLoader } from "react-spinners"
 import * as yup from "yup"
 
-//import toast from "react-hot-toast";
 //import ModalButton from "./ModalBtn";
 import useLoginModal from "@/hooks/useLoginModal"
 import useSignupModal from "@/hooks/useSignupModal"
+
+import { registerUser } from "@/lib/api/Authen"
 
 import Input from "../Input"
 import Heading from "../ModalHead"
@@ -20,22 +22,23 @@ const emailUsernameRegex = /^[a-zA-Z0-9.]+$/
 
 // Define the form schema with Yup
 const schema = yup.object().shape({
-  name: yup.string().required("Name is required"),
+  name: yup.string().required("Hãy nhập tên của bạn"),
   email: yup
     .string()
     .matches(
       emailUsernameRegex,
-      "Email is invalid. Only letters (a-z), numbers (0-9), and periods (.) are allowed."
+      "Email không hợp lệ"
     )
-    .required("Email is required"),
+    .required("Email là bắt buộc"),
   password: yup
     .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+    .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
+    .required("Mật khẩu là bắt buộc"),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm Password is required")
+    .oneOf([yup.ref("password")], "Mật khẩu không khớp")
+    .required("Hãy nhập lại mật khẩu"),
+  phoneNumber: yup.string().required("Hãy nhập số điện thoại") // Add validation for phone number
 })
 
 // Define types for the form data
@@ -44,6 +47,7 @@ interface FormData {
   email: string
   password: string
   confirmPassword: string
+  phoneNumber: string
 }
 
 const SignupModal: React.FC = () => {
@@ -58,35 +62,45 @@ const SignupModal: React.FC = () => {
   } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "",
       email: "",
+      name: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      phoneNumber: ""
     }
   })
 
-  //   const onSubmit: SubmitHandler<FormData> = useCallback(
-  //     async (data) => {
-  //       try {
-  //         setIsLoading(true);
-  //         const emailWithDomain = `${data.email}@gmail.com`;
-  //         await registerUser(emailWithDomain, data.name, data.password);
-  //         setIsLoading(false);
-  //         registerModal.onClose();
-  //         OTPconfirmModal.onOpen(emailWithDomain);
-  //         toast.success("Please verify your email to finish register!");
-  //       } catch (error: any) {
-  //         if (error.response && error.response.status === 400) {
-  //           toast.error("Email already exists!");
-  //         } else {
-  //           toast.error("Something went wrong");
-  //         }
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     },
-  //     [registerModal, OTPconfirmModal]
-  //   );
+  const onSubmit: SubmitHandler<FormData> = useCallback(
+    async (data) => {
+      try {
+        setIsLoading(true)
+        const emailWithDomain = `${data.email}@gmail.com`
+        await registerUser(
+          emailWithDomain,
+          data.name,
+          data.password,
+          data.confirmPassword,
+          data.phoneNumber
+        )
+        setIsLoading(false)
+        signupModal.onClose()
+        toast.success("Please verify your email to finish register!")
+      } catch (error: any) {
+        if (error.response && error.response.status === 400) {
+          const errorMessage = error.response.data.errors
+            ? error.response.data.errors.map((err: { value: string }) => `${err.value}`).join(', ')
+            : error.response.data.message || "Error occurred!"
+            
+          toast.error(errorMessage)
+        } else {
+          toast.error("Something went wrong")
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [signupModal]
+  )
 
   const toggle = useCallback(() => {
     signupModal.onClose()
@@ -146,13 +160,26 @@ const SignupModal: React.FC = () => {
       {errors.confirmPassword && (
         <p className="text-red-500">{errors.confirmPassword.message}</p>
       )}
+
+      <Input
+        id="phoneNumber"
+        type="text"
+        label="Số điện thoại"
+        disabled={isLoading}
+        register={register}
+        errors={errors}
+        required
+      />
+      {errors.phoneNumber && (
+        <p className="text-red-500">{errors.phoneNumber.message}</p>
+      )}
     </div>
   )
 
   const footerContent = (
     <div className="mt-3 flex flex-col gap-4">
       <hr />
-      <div className="mt-4 text-center font-semibold text-sm">
+      <div className="mt-4 text-center text-sm font-semibold">
         <div className="flex flex-row items-center justify-center gap-2">
           <div>Đã có tài khoản?</div>
           <div
@@ -175,7 +202,7 @@ const SignupModal: React.FC = () => {
         isLoading ? <ClipLoader size={20} color={"#fff"} /> : "Tiếp tục"
       }
       onClose={signupModal.onClose}
-      //onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
       footer={footerContent}
     />

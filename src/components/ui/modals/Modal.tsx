@@ -7,7 +7,7 @@ import ModalButton from "./ModalBtn"
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
-  //onSubmit: () => void
+  onSubmit: () => void
   title?: string
   body?: React.ReactElement
   footer?: React.ReactElement
@@ -20,7 +20,7 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
-  //onSubmit,
+  onSubmit,
   title,
   body,
   footer,
@@ -46,13 +46,13 @@ const Modal: React.FC<ModalProps> = ({
     }, 300)
   }, [disabled, onClose])
 
-  // const handleSubmit = useCallback(() => {
-  //   if (disabled) {
-  //     return
-  //   }
+   const handleSubmit = useCallback(() => {
+    if (disabled) {
+      return
+    }
 
-  //   onSubmit()
-  // }, [disabled, onSubmit])
+     onSubmit()
+   }, [disabled, onSubmit])
 
   const handleSecondaryAction = useCallback(() => {
     if (disabled || !secondaryAction) {
@@ -92,14 +92,14 @@ const Modal: React.FC<ModalProps> = ({
                     <ModalButton
                       disable={disabled}
                       label={secondaryActionLabel}
-                      //onClick={handleSecondaryAction}
+                      onClick={handleSecondaryAction}
                     />
                   )}
 
                   <ModalButton
                     disable={disabled}
                     label={actionLabel}
-                    //onClick={handleSubmit}
+                    onClick={handleSubmit}
                   />
                 </div>
                 {footer}
