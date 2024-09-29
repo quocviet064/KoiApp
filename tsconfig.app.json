@@ -23,7 +23,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "esModuleInterop": true,  // Allows default import compatibility with CommonJS modules
+    "allowSyntheticDefaultImports": true  // Enables synthetic default imports
   },
+  
   "include": ["src"]
 }
