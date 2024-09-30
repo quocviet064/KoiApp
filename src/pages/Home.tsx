@@ -1,11 +1,14 @@
+import FengShui from "@/components/local/default/FengShui"
+import HomeHero from "@/components/local/default/HomeHero"
 
-
-
-const Home = () => {
-
-    return(
-        <div className="pt-32">Home</div>
-    )
+function Home() {
+  return (
+    <div>
+      <HomeHero />
+      <div className="px-20">
+        <FengShui />
+      </div>
+    </div>
+  )
 }
-
-export default Home;
+export default Home
