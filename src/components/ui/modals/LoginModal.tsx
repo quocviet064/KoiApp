@@ -1,18 +1,20 @@
 import { useCallback, useState } from "react"
-import { useDispatch } from "react-redux";
+
 import { yupResolver } from "@hookform/resolvers/yup"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
+import toast from "react-hot-toast"
+import { useDispatch } from "react-redux"
+import { useNavigate } from "react-router-dom"
 import { ClipLoader } from "react-spinners"
 import * as yup from "yup"
 import useLoginModal from "@/hooks/useLoginModal"
 import useSignupModal from "@/hooks/useSignupModal"
+import { loginUser } from "@/lib/api/Authen"
+import { setCurrentUser } from "@/lib/redux/reducers/userSlice"
+import { AppDispatch } from "@/lib/redux/store"
 import Input from "../Input"
 import Heading from "../ModalHead"
 import Modal from "./Modal"
-import { setCurrentUser } from "@/lib/redux/reducers/userSlice"
-import { loginUser } from "@/lib/api/Authen"
-import toast from "react-hot-toast";
-import { AppDispatch } from "@/lib/redux/store";
 
 // Define the schema with yup
 const schema = yup.object().shape({
@@ -26,7 +28,8 @@ interface LoginFormData {
 }
 
 const LoginModal = () => {
-  const dispatch = useDispatch<AppDispatch>(); 
+  const dispatch = useDispatch<AppDispatch>()
+  const navigate = useNavigate()
   const loginModal = useLoginModal()
   const signupModal = useSignupModal()
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -46,35 +49,47 @@ const LoginModal = () => {
   const onSubmit: SubmitHandler<LoginFormData> = useCallback(
     async (data) => {
       try {
-        setIsLoading(true);
-        const result = await dispatch(loginUser(data.email, data.password));
-        setIsLoading(false);
+        setIsLoading(true)
+        const result = await dispatch(loginUser(data.email, data.password))
+        setIsLoading(false)
 
         // Store token in localStorage (or sessionStorage as in loginUser function)
         if (result && result.user) {
           const mappedUser = {
-            Id: result.user.Id,  
+            Id: result.user.Id,
             Name: result.user.Name,
             Email: result.user.Email,
-            Role: result.user.Role,
-          };
-          dispatch(setCurrentUser(mappedUser));
-          
-          toast.success(result.message);
-          loginModal.onClose();
+            Role: result.user.Role
+          }
+          dispatch(setCurrentUser(mappedUser))
+
+          toast.success(result.message)
+          loginModal.onClose()
         }
       } catch (error: any) {
-        setIsLoading(false);
-        toast.error("Invalid email or password!");
-        console.error("Login error:", error);
+        setIsLoading(false)
+        if (error.response && error.response.status === 400) {
+          const errorMessage = error.response.data.errors
+            ? error.response.data.errors.map((err: { value: string }) => `${err.value}`).join(', ')
+            : error.response.data.message || "Error occurred!"
+            
+          toast.error(errorMessage)
+        } else {
+          toast.error("Something went wrong")
+        }
       }
     },
     [loginModal, dispatch]
-  );
+  )
 
   const toogle = useCallback(() => {
     loginModal.onClose()
     signupModal.onOpen()
+  }, [loginModal])
+
+  const handleForgotPass = useCallback(() => {
+    navigate("/Password-forgot")
+    loginModal.onClose()
   }, [loginModal])
 
   const bodyContent = (
@@ -126,7 +141,7 @@ const LoginModal = () => {
         <div className="flex flex-row items-center justify-center gap-2">
           <div>Quên mật khẩu? </div>
           <div
-            onClick={toogle}
+            onClick={handleForgotPass}
             className="cursor-pointer text-sm hover:underline"
           >
             Ở đây

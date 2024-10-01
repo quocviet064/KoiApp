@@ -75,7 +75,7 @@ const SignupModal: React.FC = () => {
       try {
         setIsLoading(true)
         const emailWithDomain = `${data.email}@gmail.com`
-        await registerUser(
+        const result = await registerUser(
           emailWithDomain,
           data.name,
           data.password,
@@ -84,7 +84,7 @@ const SignupModal: React.FC = () => {
         )
         setIsLoading(false)
         signupModal.onClose()
-        toast.success("Please verify your email to finish register!")
+        toast.success(result.message)
       } catch (error: any) {
         if (error.response && error.response.status === 400) {
           const errorMessage = error.response.data.errors

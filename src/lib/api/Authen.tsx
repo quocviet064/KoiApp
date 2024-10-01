@@ -1,6 +1,5 @@
 import { jwtDecode } from "jwt-decode"
 import { Dispatch } from "redux"
-
 import { setCurrentUser } from "../redux/reducers/userSlice"
 import { axiosClient } from "./config/axios-client"
 
@@ -10,12 +9,11 @@ interface User {
   Name: string
   Email: string
   Role: string
-  // Add any other fields from your backend response for the user
 }
 
 interface RegisterResponse {
-  // Define the structure of the registration response
   data: any
+  message: string
 }
 
 interface LoginResponse {
@@ -27,7 +25,6 @@ interface LoginResponse {
   // Add any other fields from your backend response for the login
 }
 
-// Define the expected error shape if applicable
 interface ErrorResponse {
   message: string
 }
@@ -102,3 +99,4 @@ export const loginUser =
       throw error as ErrorResponse
     }
   }
+
