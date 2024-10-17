@@ -7,16 +7,18 @@ import { IoMdFemale, IoMdMale } from "react-icons/io"
 import { TbGenderBigender } from "react-icons/tb"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
+
 import { RootState } from "@/lib/redux/store"
+
 import Avatar from "@/components/layout/header/Avatar"
 
+import CustomButton from "./Setting/Components/CustomBtn"
 
 const UserProfilePage = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [selectedImage, setSelectedImage] = useState<string | undefined>(
-    "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-  )
+  const defaultAvatar =
+    "https://t4.ftcdn.net/jpg/02/29/75/83/360_F_229758328_7x8jwCwjtBMmC6rgFzLFhZoEpLobB6L8.jpg"
 
   const [isHovered, setIsHovered] = useState(false) // State to handle hover effect
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -56,7 +58,7 @@ const UserProfilePage = () => {
         >
           <div className="relative">
             <Avatar
-              userImg={userProfile ? userProfile.avatar : "Loading..."}
+              userImg={userProfile?.avatar || defaultAvatar}
               w="200px"
               h="200px"
             />
@@ -75,58 +77,70 @@ const UserProfilePage = () => {
       {/* Profile Info */}
       <div className="mt-20 text-center">
         <h2 className="text-2xl font-bold">
-          {userProfile ? userProfile.userName : "Loading..."}
+          {userProfile?.userName || "Please update your profile"}
         </h2>
       </div>
 
       {/* Info Cards */}
       <div className="mx-auto mt-6 grid max-w-6xl grid-cols-1 gap-6 px-4 md:grid-cols-2">
         {/* Introduction Card */}
-        <div className="rounded-lg bg-white p-6 shadow">
-          <h3 className="text-lg font-semibold">Giới thiệu</h3>
-          <p className="mt-2 text-gray-600">
-            <span className="inline-flex items-center">
-              <svg
-                className="mr-2 h-4 w-4"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 12c2.28 0 4.5-.91 6.23-2.65C19.96 8.5 20.5 6.28 20.5 4S19.96.5 18.23 2.65 14.28 4.5 12 4.5s-4.5-.91-6.23 2.65C5.04 8.5 4.5 10.72 4.5 13s1.91 4.5 4.65 4.5 4.65-.91 6.23-2.65"></path>
-              </svg>
-              Là thành viên từ {userProfile ? userProfile.createdDate : "Loading..."}
-            </span>
-          </p>
-        </div>
+        {userProfile ? (
+          <div className="rounded-lg bg-white p-6 shadow">
+            <h3 className="text-lg font-semibold">Giới thiệu</h3>
+            <p className="mt-2 text-gray-600">
+              <span className="inline-flex items-center">
+                Là thành viên từ {userProfile?.createdDate || "N/A"}
+              </span>
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-lg bg-white p-6 shadow">
+            <h3 className="text-lg font-semibold">Giới thiệu</h3>
+            <p className="mt-2 text-gray-600">
+              <span className="inline-flex items-center">Trống</span>
+            </p>
+          </div>
+        )}
 
         {/* Profile Card */}
         <div className="flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow">
           <h3 className="text-lg font-semibold">Thông tin cá nhân</h3>
-          <div className="flex flex-col justify-start">
-            <span className="my-4 inline-flex items-center gap-3">
-              <p className="inline-flex items-center gap-3 font-semibold">
-                <FaUserTie /> Họ và tên :
-              </p>
-              {userProfile ? userProfile.fullName : "Loading..."}
-            </span>
-            <span className="my-4 inline-flex items-center gap-3">
-              <p className="inline-flex items-center gap-3 font-semibold">
-                <FaIdCard /> Mã định danh :
-              </p>
-              {userProfile ? userProfile.identityCard : "Loading..."}
-            </span>
-            <span className="my-4 inline-flex items-center gap-3">
-              <p className="inline-flex items-center gap-3 font-semibold">
-                <TbGenderBigender /> Giới tính :
-              </p>
-              {userProfile ? userProfile.gender : "Loading..."}
-            </span>
-            <span className="my-4 inline-flex items-center gap-3">
-              <p className="inline-flex items-center gap-3 font-semibold">
-                <FaBirthdayCake /> Ngày/Năm sinh :
-              </p>
-              {userProfile ? userProfile.dateOfBirth : "Loading..."}
-            </span>
-          </div>
+          {userProfile ? (
+            <div className="flex flex-col justify-start">
+              <span className="my-4 inline-flex items-center gap-3">
+                <p className="inline-flex items-center gap-3 font-semibold">
+                  <FaUserTie /> Họ và tên :
+                </p>
+                {userProfile.fullName}
+              </span>
+              <span className="my-4 inline-flex items-center gap-3">
+                <p className="inline-flex items-center gap-3 font-semibold">
+                  <FaIdCard /> Mã định danh :
+                </p>
+                {userProfile.identityCard}
+              </span>
+              <span className="my-4 inline-flex items-center gap-3">
+                <p className="inline-flex items-center gap-3 font-semibold">
+                  <TbGenderBigender /> Giới tính :
+                </p>
+                {userProfile.gender}
+              </span>
+              <span className="my-4 inline-flex items-center gap-3">
+                <p className="inline-flex items-center gap-3 font-semibold">
+                  <FaBirthdayCake /> Ngày/Năm sinh :
+                </p>
+                {userProfile.dateOfBirth}
+              </span>
+            </div>
+          ) : (
+            <div className="mt-4 text-center text-gray-600">
+              <p>Bấm vào đây để cập nhật thông tin cá nhân </p>
+              <CustomButton
+                label="Cập nhật ngay"
+                onClick={() => navigate("/Setting/profile")}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

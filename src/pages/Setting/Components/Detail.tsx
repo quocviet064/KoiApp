@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import {
   Listbox,
@@ -16,14 +16,17 @@ import { MdEdit } from "react-icons/md"
 import { RiArrowDropDownLine } from "react-icons/ri"
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { uploadImage } from "@/lib/api/Image"
-import { CreateOrUpdateUserProfile, GetUserProfile } from "@/lib/api/User"
-import Avatar from "@/components/layout/header/Avatar"
-import Input from "@/components/ui/Input"
-import CustomButton from "./CustomBtn"
 import { Navigate } from "react-router-dom"
+
+import { uploadImage } from "@/lib/api/Image"
+import { updateUserAvatar } from "@/lib/api/Image"
+import { CreateOrUpdateUserProfile, GetUserProfile } from "@/lib/api/User"
 import { setDetailUser } from "@/lib/redux/reducers/userSlice"
 
+import Avatar from "@/components/layout/header/Avatar"
+import Input from "@/components/ui/Input"
+
+import CustomButton from "./CustomBtn"
 
 interface AccountDetailProps {
   fullName: string
@@ -36,11 +39,10 @@ interface AccountDetailProps {
 
 // Utility function to convert "DD/MM/YYYY" string to a Date object
 const formatDate = (date: Date) => {
-  const offset = date.getTimezoneOffset();
-  const adjustedDate = new Date(date.getTime() - (offset*60*1000)); // Adjust for time zone
-  return adjustedDate.toISOString().split('T')[0]; // Return "YYYY-MM-DD" only
+  const offset = date.getTimezoneOffset()
+  const adjustedDate = new Date(date.getTime() - offset * 60 * 1000) // Adjust for time zone
+  return adjustedDate.toISOString().split("T")[0] // Return "YYYY-MM-DD" only
 }
-
 
 const AccountDetail: React.FC<AccountDetailProps> = ({
   fullName: defaultname,
@@ -50,8 +52,8 @@ const AccountDetail: React.FC<AccountDetailProps> = ({
   imageId,
   avatar
 }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [fullName, setFullName] = useState(defaultname)
   const [identityCard, setIdentityCard] = useState(defaultIdentity)
   const [isEditingFullName, setIsEditingFullName] = useState(false)
@@ -60,7 +62,13 @@ const AccountDetail: React.FC<AccountDetailProps> = ({
   const [startDate, setStartDate] = useState<Date | null>()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedGender, setSelectedGender] = useState(gender)
+  const [selectedGender, setSelectedGender] = useState("Nam")
+
+  useEffect(() => {
+    if (dateOfBirth) {
+      setStartDate(new Date(dateOfBirth)) // Ensure dateOfBirth is converted to Date
+    }
+  }, [dateOfBirth])
 
   const handleAvatarClick = () => {
     if (fileInputRef.current) {
@@ -125,6 +133,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({
   }
 
   //----------------------------------Logic onSubmit---------------------------------//
+
   // API call to update the user profile
   const onSubmit = handleSubmit(async (data) => {
     setIsLoading(true)
@@ -137,13 +146,11 @@ const AccountDetail: React.FC<AccountDetailProps> = ({
         console.log("img-file:", filePath)
         //const fileName = `Image of ${data.fullName}`;
 
-        const uploadResponse = await uploadImage(filePath)
-        console.log(uploadResponse)
-        if (uploadResponse != null) {
-          imageId = uploadResponse || imageId
-          console.log("Image ID:", imageId)
-        } else {
-          console.error("Error to save imageId")
+        const imageId = await uploadImage(filePath)
+        console.log(imageId)
+        if (imageId) {
+          const updateImageResponse = await updateUserAvatar(imageId)
+          console.log("Image Updated Successfully:", updateImageResponse)
         }
       }
 
@@ -151,30 +158,30 @@ const AccountDetail: React.FC<AccountDetailProps> = ({
       const profileData = {
         fullName,
         identityCard,
-        dateOfBirth: startDate? formatDate(startDate) : "",
-        gender: selectedGender,
-        imageId: imageId || data.imageId
+        dateOfBirth: startDate ? formatDate(startDate) : formatDate(new Date()),
+        gender: selectedGender
+        //imageId: imageId || data.imageId
       }
 
       const response = await CreateOrUpdateUserProfile(profileData, dispatch)
       console.log(profileData)
-      
+
       if (response && response.isSuccess) {
-        const updatedProfile = await GetUserProfile(dispatch);
-  
+        const updatedProfile = await GetUserProfile(dispatch)
+
         // Dispatch the updated profile data to Redux store
         if (updatedProfile && updatedProfile.result) {
-          dispatch(setDetailUser(updatedProfile.result));
-          console.log("Updated profile:", updatedProfile.result);
+          dispatch(setDetailUser(updatedProfile.result))
+          console.log("Updated profile:", updatedProfile.result)
         }
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Đã có lỗi xảy ra khi kết nối tới server!");
+      console.error(error)
+      toast.error("Đã có lỗi xảy ra khi kết nối tới server!")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  });
+  })
 
   const people = [
     { id: 1, name: "Nam" },
