@@ -17,14 +17,16 @@ interface User {
 
 interface ProfileSettingProps {}
 
+
 const ProfileSetting: React.FC<ProfileSettingProps> = () => {
   //const dispatch = useDispatch()
-
-  const user = useSelector((state: RootState) => state.users.detailUser)
   const currentUser = useSelector((state: RootState) => state.users.currentUser)
 
   
   const userProfile = useSelector((state: RootState) => state.users.detailUser)
+  const defaultAvatar =
+    "https://t4.ftcdn.net/jpg/02/29/75/83/360_F_229758328_7x8jwCwjtBMmC6rgFzLFhZoEpLobB6L8.jpg"
+
   console.log(userProfile)
 
   useEffect(() => {
@@ -48,7 +50,7 @@ const ProfileSetting: React.FC<ProfileSettingProps> = () => {
                dateOfBirth={userProfile?.dateOfBirth || ""}
                gender={userProfile?.gender || ""}
                imageId=""
-               avatar={userProfile?.avatar || ""}
+               avatar={userProfile?.avatar || defaultAvatar}
             />
           </div>
         </div>

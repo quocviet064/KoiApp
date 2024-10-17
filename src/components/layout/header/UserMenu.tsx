@@ -38,6 +38,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   const navigate = useNavigate()
   //const [userProfile, setUserProfile] = useState<any>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const defaultAvatar = "https://t4.ftcdn.net/jpg/02/29/75/83/360_F_229758328_7x8jwCwjtBMmC6rgFzLFhZoEpLobB6L8.jpg";
 
   const ToggleOpen = useCallback(() => {
     setIsOpen((value) => !value)
@@ -83,7 +84,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
         <HoverBorderGradient>
           {currentUser?.Name}
           <Avatar
-            userImg={userProfile ? userProfile.avatar : "Loading..."}
+            userImg={userProfile && userProfile.avatar ? userProfile.avatar : defaultAvatar}
             w="32px"
             h="32px"
             //onClick={()=> {}}

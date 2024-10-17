@@ -4,8 +4,9 @@ import "nprogress/nprogress.css"
 import toast from "react-hot-toast"
 import { Dispatch } from "redux"
 
-import { setDetailUser, clearCurrentUser } from "../redux/reducers/userSlice"
+import { clearCurrentUser, setDetailUser } from "../redux/reducers/userSlice"
 import { axiosClient } from "./config/axios-client"
+import { toastWarn } from "@/components/providers/Toaster"
 
 interface UserPassWord {
   email: string
@@ -42,7 +43,7 @@ interface Response {
   result: {
     fullName: string
     identityCard: string
-    dateOfBirth: string
+    dateOfBirth: Date
     gender: string
     avatar: string
     userId: string
@@ -119,8 +120,8 @@ export const CreateOrUpdateUserProfile = async (
         fullName: userProfile.fullName,
         identityCard: userProfile.identityCard,
         dateOfBirth: userProfile.dateOfBirth,
-        gender: userProfile.gender,
-        imageId: userProfile.imageId
+        gender: userProfile.gender
+        //imageId: userProfile.imageId
       }
     )
     nProgress.done()
@@ -128,7 +129,7 @@ export const CreateOrUpdateUserProfile = async (
     if (response.data.isSuccess) {
       toast.success("Cập nhật thông tin thành công!")
     }
-   
+
     return response.data
   } catch (error: any) {
     if (axios.isAxiosError(error) && error.response) {
@@ -156,14 +157,21 @@ export const GetUserProfile = async (
     }
     return response.data
   } catch (error: any) {
+    nProgress.done()
     if (axios.isAxiosError(error) && error.response) {
-      if (error.response.status === 401) {
-        nProgress.done()
-        console.log("Token has expired or is invalid.")
-        toast.error("Your session has expired. Please log in again.")
-        dispatch(clearCurrentUser());
-      } else {
-        toast.error(error.response.data?.statusCode || "Loi o day")
+      switch (error.response.status) {
+        case 400:
+          toastWarn("Hãy cập nhật thông tin của bạn!")
+          break
+        case 401:
+          dispatch(clearCurrentUser())
+          window.location.href = "/";
+          toast.error("Phiên của bạn đã hết hạn !!")
+          break
+        default:
+          toast.error(
+            error.response.data?.statusCode || "An unknown error occurred"
+          )
       }
     } else {
       toast.error("An unknown error occurred")
