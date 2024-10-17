@@ -30,7 +30,7 @@ const Navbar = () => {
   
 
   return (
-    <div className="sticky top-0 z-20 w-full bg-background shadow-sm">
+    <div className="sticky top-0 z-40 w-full bg-background shadow-2xl">
       <div className="h-[110px] border-b-[1px]">
         <Container>
           <div className="flex flex-row items-center justify-between gap-3 md:gap-0">
