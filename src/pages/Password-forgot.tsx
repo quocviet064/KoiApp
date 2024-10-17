@@ -78,6 +78,7 @@ const PasswordForgot = () => {
               </h2>
               <Input
                 id="email"
+                placeholder=""
                 type="email"
                 label="Email của bạn"
                 disabled={isLoading}

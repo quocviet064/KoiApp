@@ -25,8 +25,20 @@ interface LoginResponse {
   // Add any other fields from your backend response for the login
 }
 
-interface ErrorResponse {
+interface VerifyEmailResponse {
   message: string
+  user: User
+}
+
+interface ErrorResponse {
+  statusCode: number
+  isSuccess: boolean
+  message: string
+  errors: Array<{
+    key: string;
+    value: string;
+  }>;
+  result: any;
 }
 
 // Register User function
@@ -95,6 +107,25 @@ export const loginUser =
       } else {
         throw new Error(responseData.message || "Login failed!")
       }
+    } catch (error) {
+      throw error as ErrorResponse
+    }
+  }
+
+  // Verify Email function
+  export const verifyEmail = async (
+    token: string,
+    email: string
+  ): Promise<VerifyEmailResponse> => {
+    try {
+      const response = await axiosClient.get<VerifyEmailResponse>(
+        `/api/Accounts/verify-email?token=${token}&email=${email}`
+      )
+  
+      const responseData = response.data
+      console.log("Response Data:", responseData)
+  
+      return responseData
     } catch (error) {
       throw error as ErrorResponse
     }

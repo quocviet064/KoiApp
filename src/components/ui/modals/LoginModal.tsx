@@ -68,14 +68,17 @@ const LoginModal = () => {
         }
       } catch (error: any) {
         setIsLoading(false)
-        if (error.response && error.response.status === 400) {
-          const errorMessage = error.response.data.errors
-            ? error.response.data.errors.map((err: { value: string }) => `${err.value}`).join(', ')
-            : error.response.data.message || "Error occurred!"
-            
-          toast.error(errorMessage)
+        if (error.response && error.response.data && error.response.data.errors) {
+          const errors = error.response.data.errors;
+          if (Array.isArray(errors) && errors.length > 0) {
+            errors.forEach((err: { key: string; value: string }) => {
+              toast.error(`${err.value}`);
+            });
+          } else {
+            toast.error("Login failed due to unknown reasons");
+          }
         } else {
-          toast.error("Something went wrong")
+          toast.error("An unknown error occurred during login.");
         }
       }
     },
@@ -88,7 +91,7 @@ const LoginModal = () => {
   }, [loginModal])
 
   const handleForgotPass = useCallback(() => {
-    navigate("/Password-forgot")
+    navigate("/password-forgot")
     loginModal.onClose()
   }, [loginModal])
 
@@ -101,20 +104,24 @@ const LoginModal = () => {
 
       <Input
         id="email"
+        onChange={()=>{}}
         label="Email hoặc tên"
         disabled={isLoading}
         register={register}
         errors={errors}
+        placeholder=""
         required
       />
       {errors.email && <p className="text-red-500">{errors.email.message}</p>}
       <Input
         id="password"
+        onChange={()=>{}}
         type="password"
         label="Mật khẩu"
         disabled={isLoading}
         register={register}
         errors={errors}
+        placeholder=""
         required
       />
       {errors.password && (

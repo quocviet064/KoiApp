@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from "react"
 
+import { yupResolver } from "@hookform/resolvers/yup"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { ClipLoader } from "react-spinners"
-import { yupResolver } from "@hookform/resolvers/yup"
-import useLoginModal from "@/hooks/useLoginModal"
 import * as yup from "yup"
+
+import useLoginModal from "@/hooks/useLoginModal"
+
 import { ResetPassword } from "@/lib/api/User"
 
 import { Button } from "@/components/global/atoms/button"
@@ -16,6 +18,7 @@ import Input from "@/components/ui/Input"
 
 const PasswordReset = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [emailMissing, setEmailMissing] = useState<boolean>(false)
   const loginModal = useLoginModal()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -28,19 +31,18 @@ const PasswordReset = () => {
   }
 
   // Define the form schema with Yup
-const schema = yup.object().shape({
-  email: yup.string().notRequired(),
-  token: yup.string().notRequired(), 
-  newPassword: yup
-    .string()
-    .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
-    .required("Mật khẩu là bắt buộc"),
-  confirmedNewPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Mật khẩu không khớp")
-    .required("Hãy nhập lại mật khẩu"),
-})
-
+  const schema = yup.object().shape({
+    email: yup.string().notRequired(),
+    token: yup.string().notRequired(),
+    newPassword: yup
+      .string()
+      .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
+      .required("Mật khẩu là bắt buộc"),
+    confirmedNewPassword: yup
+      .string()
+      .oneOf([yup.ref("password")], "Mật khẩu không khớp")
+      .required("Hãy nhập lại mật khẩu")
+  })
 
   const {
     register,
@@ -57,7 +59,6 @@ const schema = yup.object().shape({
     }
   })
 
-
   useEffect(() => {
     // Extract email and token from the query params
     const email = searchParams.get("email")
@@ -67,6 +68,8 @@ const schema = yup.object().shape({
     if (email && token) {
       setValue("email", email)
       setValue("token", token)
+    } else if (!email) {
+      setEmailMissing(true)
     }
   }, [searchParams, setValue])
 
@@ -111,6 +114,29 @@ const schema = yup.object().shape({
     []
   )
 
+  if (emailMissing) {
+    return (
+      <BackgroundEff className="pointer-events-none flex w-full flex-col items-center justify-center px-4">
+        <div className="pointer-events-auto z-20 mb-12 cursor-pointer">
+          <Link to="/">
+            <Logo />
+          </Link>
+        </div>
+        <div className="pointer-events-auto z-20 w-full bg-white">
+          <div className="flex flex-col items-center justify-center px-4 py-6">
+            <div className="w-full max-w-md">
+              <div className="rounded-3xl p-8 shadow-2xl">
+                <h2 className="mb-16 text-center text-2xl font-bold text-primary">
+                  Vui lòng kiểm tra email để lấy liên kết khôi phục mật khẩu !
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </BackgroundEff>
+    )
+  }
+
   return (
     <BackgroundEff className="pointer-events-none flex w-full flex-col items-center justify-center px-4">
       <div className="pointer-events-auto z-20 mb-12 cursor-pointer">
@@ -128,6 +154,7 @@ const schema = yup.object().shape({
               <div className="flex flex-col gap-3">
                 <Input
                   id="email"
+                  placeholder=""
                   type="email"
                   label="Email của bạn"
                   disabled={true}
@@ -137,6 +164,7 @@ const schema = yup.object().shape({
                 />
                 <Input
                   id="newPassword"
+                  placeholder=""
                   type="password"
                   label="Mật khẩu mới"
                   disabled={isLoading}
@@ -146,6 +174,7 @@ const schema = yup.object().shape({
                 />
                 <Input
                   id="confirmedNewPassword"
+                  placeholder=""
                   type="password"
                   label="Nhập lại mật khẩu"
                   disabled={isLoading}
