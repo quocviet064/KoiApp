@@ -2,22 +2,6 @@ import axios from "axios";
 import { axiosClient } from "./config/axios-client";
 
 
-
-interface Response {
-    statusCode: number;
-    isSuccess: boolean;
-    message: string;
-    result: {
-      isSuccess: boolean;
-      message: string;
-    };
-  }
-  
-  interface ErrorResponse {
-    message: any
-  }
-
-
 interface ImageUploadResponse {
   statusCode: number;
   isSuccess: boolean;
@@ -46,6 +30,27 @@ interface ImageUploadResponse {
     message: string;
     result: {
       avatar: number;
+    };
+  }
+
+  interface GetImagesForMemberResponse {
+    statusCode: number;
+    isSuccess: boolean;
+    message: string;
+    result: {
+      pageIndex: number;
+      totalPages: number;
+      totalItems: number;
+      hasPreviousPage: boolean;
+      hasNextPage: boolean;
+      datas: Array<{
+        id: number;
+        filePath: string; 
+        altText: string | null;
+        userId: string;
+        userName: string;
+        createdDate: string;
+      }>;
     };
   }
   
@@ -98,3 +103,27 @@ interface ImageUploadResponse {
     }
   };
   
+
+  interface GetImagesForMemberRequest {
+    pageIndex: number;
+    pageSize: number;
+    name?: string;
+    orderDate?: null;
+  }
+  
+  
+  export const getImagesForMember = async (
+    requestData: GetImagesForMemberRequest
+  ): Promise<GetImagesForMemberResponse> => {
+    try {
+      const response = await axiosClient.post<GetImagesForMemberResponse>(
+        "/api/Images/get-images-for-member",
+        requestData
+      );
+      console.log(response)
+      return response.data;
+      
+    } catch (error: any) {
+      throw error;
+    }
+  };

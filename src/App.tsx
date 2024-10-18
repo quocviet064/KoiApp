@@ -14,7 +14,9 @@ import LoginModal from "./components/ui/modals/LoginModal"
 import SignupModal from "./components/ui/modals/SignupModal"
 import store, { persistor } from "./lib/redux/store"
 import Blog from "./pages/Blog/Blog"
+import Editor from "./pages/Blog/CreateBlog"
 import { ViewBlog } from "./pages/Blog/ViewBlog"
+import CreateBlogModal from "./pages/Blog/components/CreateBlogModal"
 import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import PasswordForgot from "./pages/Password-forgot"
@@ -29,6 +31,7 @@ function App() {
     "/password-forgot",
     "/password-reset",
     "/verification/success",
+    "/blog/create",
     "/404"
   ]
   const shouldExcludeLayout = excludeLayoutPaths.includes(location.pathname)
@@ -40,6 +43,7 @@ function App() {
           <ToasterProvider />
           <LoginModal />
           <SignupModal />
+          <CreateBlogModal />
           {!shouldExcludeLayout && <Navbar />}
           <div className={shouldExcludeLayout ? "no-layout" : "with-layout"}>
             <Routes>
@@ -51,6 +55,7 @@ function App() {
               <Route path="/setting/profile" element={<ProfileSetting />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/read" element={<ViewBlog />} />
+              <Route path="/blog/create" element={<Editor />} />
               <Route path="/404" element={<NotFound />} />
 
               <Route path="*" element={<NotFound />} />
