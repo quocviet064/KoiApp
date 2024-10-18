@@ -2,12 +2,14 @@ import Container from "../Container"
 import { BackgroundGradient } from "../Gradient"
 import { PlaceholdersAndVanishInput } from "../PlaceHolderInput"
 import { TextGenerateEffect } from "../TextGenerate"
-
+import useBlogModal from "@/hooks/useBlogModel"
 interface CreateBlogProps {
   onClick: () => void
 }
 
 const CreateBlog: React.FC<CreateBlogProps> = ({ onClick }) => {
+  const blogModal = useBlogModal();
+  
   const words = `Hãy cho chúng tôi biết bạn đang nghĩ gì`
   const placeholders = [
     "Bạn đang thắc mắc về mệnh của mình ?",
@@ -18,11 +20,11 @@ const CreateBlog: React.FC<CreateBlogProps> = ({ onClick }) => {
 
   return (
     <Container>
-      <div className="mb-20">
+      <div className="mb-20 flex justify-center items-center">
         <BackgroundGradient className="w-full rounded-[22px] bg-white p-0 sm:p-0">
-          <div
-            className="flex h-[10rem] flex-col items-center justify-center px-4"
-            onClick={onClick}
+          <div 
+            className="flex h-[10rem] flex-col items-center justify-center px-4 cursor-pointer"
+            onClick={blogModal.onOpen}
           >
             <TextGenerateEffect words={words} />
             <PlaceholdersAndVanishInput

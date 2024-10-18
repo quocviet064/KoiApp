@@ -1,7 +1,5 @@
-"use client"
 
 import { useCallback, useState } from "react"
-
 import { yupResolver } from "@hookform/resolvers/yup"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import toast from "react-hot-toast"
@@ -115,6 +113,7 @@ const SignupModal: React.FC = () => {
       <Input
         id="email"
         placeholder=""
+        onChange={()=>{}}
         label="Email"
         domain=""
         disabled={isLoading}
@@ -127,6 +126,7 @@ const SignupModal: React.FC = () => {
       <Input
         id="name"
         placeholder=""
+        onChange={()=>{}}
         label="Tên của bạn"
         disabled={isLoading}
         register={register}
@@ -138,6 +138,7 @@ const SignupModal: React.FC = () => {
       <Input
         id="password"
         placeholder=""
+        onChange={()=>{}}
         type="password"
         label="Mật khẩu"
         disabled={isLoading}
@@ -152,6 +153,7 @@ const SignupModal: React.FC = () => {
       <Input
         id="confirmPassword"
         placeholder=""
+        onChange={()=>{}}
         type="password"
         label="Nhập lại mật khẩu"
         disabled={isLoading}
@@ -166,6 +168,7 @@ const SignupModal: React.FC = () => {
       <Input
         id="phoneNumber"
         placeholder=""
+        onChange={()=>{}}
         type="text"
         label="Số điện thoại"
         disabled={isLoading}
