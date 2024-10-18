@@ -21,6 +21,7 @@ import { FileUpload } from "@/components/ui/FileUpload"
 
 import BlogModal from "./BlogModal"
 import ImgChoosingModal from "./ImgChoosingModal"
+import { uploadImage } from "@/lib/api/Image"
 
 // Define the schema with yup
 const schema = yup.object().shape({
@@ -53,6 +54,7 @@ const CreateBlogModal = () => {
   const [selectedImages, setSelectedImages] = useState<Image[]>([])
   const [hideUploadButton, setHideUploadButton] = useState<boolean>(false)
   const [hideSelectButton, setHideSelectButton] = useState<boolean>(false)
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
 
   const {
     register,
@@ -81,22 +83,50 @@ const CreateBlogModal = () => {
     setHideUploadButton(true)
   }
 
+  const handleFileChange = (files: File[]) => {
+    console.log("Selected file:", files[0]);
+    setUploadedFile(files[0]);
+  };
+  
+
+  const handleFileUpload = async (file: File): Promise<number> => {
+    try {
+      console.log("Uploading file:", file); 
+      const uploadedImageId = await uploadImage(file);
+      console.log("Uploaded image ID:", uploadedImageId);
+      return uploadedImageId;
+    } catch (error) {
+      toast.error("Failed to upload image");
+      throw error;
+    }
+  };
+
+
   const onSubmit: SubmitHandler<CreateBlogFormData> = useCallback(
     async (data) => {
       try {
         setIsLoading(true)
+
+        let imageIds = selectedImages.map((image) => image.id)
+
+        if (uploadedFile) {
+          const uploadedImageId = await handleFileUpload(uploadedFile)
+          console.log("New image ID to be added:", uploadedImageId);
+          imageIds.push(uploadedImageId)
+        }
 
         // Prepare the payload for the API call
         const blogPayload = {
           id: 0, 
           title: data.title,
           content: data.content,
-          imageIds: selectedImages.map((image) => image.id) 
+          imageIds: imageIds
         }
 
         console.log(blogPayload)
+        console.log(uploadedFile)
 
-       
+        console.log("Final Blog Payload:", blogPayload);
         const result = await createUpdateBlog(blogPayload)
 
         setIsLoading(false)
@@ -116,7 +146,7 @@ const CreateBlogModal = () => {
         toast.error(error.message || "An unknown error occurred.")
       }
     },
-    [selectedImages]
+    [selectedImages, uploadedFile]
   )
 
   const bodyContent = (
@@ -212,7 +242,7 @@ const CreateBlogModal = () => {
             </>
           )}
         </div>
-        {showFileUpload && <FileUpload />}
+        {showFileUpload && <FileUpload onChange={handleFileChange}/>}
       </div>
     </div>
   )
