@@ -77,7 +77,7 @@ const UserProfilePage = () => {
       {/* Profile Info */}
       <div className="mt-20 text-center">
         <h2 className="text-2xl font-bold">
-          {userProfile?.userName || "Please update your profile"}
+          {userProfile?.userName || "Vui lòng cập nhật thông tin cá nhân"}
         </h2>
       </div>
 
