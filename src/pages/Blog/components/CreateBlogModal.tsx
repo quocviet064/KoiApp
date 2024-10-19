@@ -49,6 +49,7 @@ const CreateBlogModal = () => {
     "https://t4.ftcdn.net/jpg/02/29/75/83/360_F_229758328_7x8jwCwjtBMmC6rgFzLFhZoEpLobB6L8.jpg"
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const currentUser = useSelector((state: RootState) => state.users.currentUser);
   const userProfile = useSelector((state: RootState) => state.users.detailUser)
   const [showFileUpload, setShowFileUpload] = useState<boolean>(false)
   const [selectedImages, setSelectedImages] = useState<Image[]>([])
@@ -259,6 +260,7 @@ const CreateBlogModal = () => {
         onClose={blogModal.onClose}
         onSubmit={handleSubmit(onSubmit)}
         body={bodyContent}
+        currentUser={currentUser}
         //footer={""}
       />
 
