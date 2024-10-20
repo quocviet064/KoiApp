@@ -17,10 +17,12 @@ import Blog from "./pages/Blog/Blog"
 import Editor from "./pages/Blog/CreateBlog"
 import { ViewBlog } from "./pages/Blog/ViewBlog"
 import CreateBlogModal from "./pages/Blog/components/CreateBlogModal"
+import FengShuiLookup from "./pages/FengShuiLookup"
 import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import PasswordForgot from "./pages/Password-forgot"
 import PasswordReset from "./pages/Password-reset"
+import ResultPage from "./pages/ResultPage"
 import ProfileSetting from "./pages/Setting/Profile"
 import UserProfilePage from "./pages/UserProfile"
 import SuccessPage from "./pages/Verification/SuccessPage"
@@ -53,11 +55,12 @@ function App() {
               <Route path="/verification/success" element={<SuccessPage />} />
               <Route path="/profile/:name" element={<UserProfilePage />} />
               <Route path="/setting/profile" element={<ProfileSetting />} />
+              <Route path="/doan-menh" element={<FengShuiLookup />} />
+              <Route path="/ket-qua" element={<ResultPage />} />{" "}
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/read" element={<ViewBlog />} />
               <Route path="/blog/create" element={<Editor />} />
               <Route path="/404" element={<NotFound />} />
-
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
